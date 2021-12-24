@@ -1,5 +1,5 @@
 <resources>
     <string name="app_name">Animeshark</string>
-    <string name="edit_message">Enter a message</string>
-    <string name="button_send">Send1</string>
+    <string name="edit_message"></string>
+    <string name="button_send">Search</string>
 </resources>
