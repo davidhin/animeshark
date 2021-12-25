@@ -1,5 +1,6 @@
 package com.example.animeshark
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -15,47 +16,38 @@ import org.json.JSONObject
 import org.jsoup.Jsoup
 
 const val EXTRA_MESSAGE = "com.example.myfirstapp.MESSAGE"
-
-data class QueryResult(val title: String, val url: String, val img: String)
+const val ANIME_INFO = "com.example.myfirstapp.ANIME_INFO"
 
 class MainActivity : AppCompatActivity() {
+
+    var data: MutableList<QueryResult> = mutableListOf<QueryResult>()
+    var adapter: AnimeQueryItemAdapter? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        searchAMP("Mushoku")
-//      getEpisodes()
-    }
 
-    /** Get Animixplay episodes **/
-    fun getEpisodes() {
-        val stringRequest = StringRequest( Request.Method.GET, "https://animixplay.to/v1/mushoku-tensei-isekai-ittara-honki-dasu",
-             { response ->
-                 val eplist = JSONObject(Jsoup.parse(response).select("div#epslistplace").text())
-                 Log.i("MY_DEBUG", eplist["0"].toString())
-             },
-            { error ->
-                Log.i("MY_DEBUG", "Response is: $error")
-            })
-        val requestQueue = Volley.newRequestQueue(this)
-        requestQueue.add(stringRequest)
+        val recyclerView: RecyclerView = findViewById(R.id.search_results)
+        adapter = AnimeQueryItemAdapter(data)  { anime -> adapterOnClick(anime) }
+        recyclerView.adapter = adapter
+        searchAMP("hunter")
     }
 
     /** Search Animixplay **/
     fun searchAMP(query: String) {
-        val stringRequest: StringRequest = object : StringRequest( Method.POST, "https://cachecow.eu/api/search",
+        val stringRequest: StringRequest = @SuppressLint("NotifyDataSetChanged")
+        object : StringRequest( Method.POST, "https://cachecow.eu/api/search",
             Response.Listener { response ->
+                data.clear()
                 val soup = Jsoup.parse(JSONObject(response)["result"].toString())
-                val items = mutableListOf<QueryResult>()
                 for (li in soup.select("li")) {
                     val alink = li.select("a")[0]
                     val title = alink.attr("title").toString()
                     val url = "https://animixplay.to" + alink.attr("href").toString()
                     val img = alink.select("img").attr("src").toString()
-                    items.add(QueryResult(title, url, img))
+                    data.add(QueryResult(title, url, img))
                 }
-                val recyclerView: RecyclerView = findViewById(R.id.search_results)
-                recyclerView.adapter = AnimeQueryItemAdapter(items)
+                adapter?.notifyDataSetChanged();
             },
             Response.ErrorListener { error ->
                 Log.i("MY_DEBUG", "Response is: $error")
@@ -70,15 +62,18 @@ class MainActivity : AppCompatActivity() {
         requestQueue.add(stringRequest)
     }
 
+    /** Opens AnimeViewActivity when RecyclerView item is clicked. */
+    private fun adapterOnClick(anime: QueryResult) {
+        val intent = Intent(this, AnimeInfoActivity()::class.java).apply {
+            putExtra(ANIME_INFO, anime)
+        }
+        startActivity(intent)
+    }
+
     /** Called when the user taps the Send button */
-    fun sendMessage(view: View) {
+    fun sendSearch(view: View) {
         val editText = findViewById<EditText>(R.id.editTextTextPersonName)
         val message = editText.text.toString()
-        Log.i("MY_DEBUG",message)
-        val intent = Intent(this, DisplayMessageActivity::class.java).apply {
-            putExtra(EXTRA_MESSAGE, message)
-        }
         searchAMP(message)
-//        startActivity(intent)
     }
 }

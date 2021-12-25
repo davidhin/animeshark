@@ -4,15 +4,24 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".DisplayMessageActivity">
+    tools:context=".AnimeInfoActivity">
 
     <TextView
-        android:id="@+id/textView"
+        android:id="@+id/anime_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:text="TextView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/anime_episodes"
+        android:layout_width="409dp"
+        android:layout_height="694dp"
+        android:layout_marginTop="16dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/anime_title"
+        app:layoutManager="LinearLayoutManager" />
 </androidx.constraintlayout.widget.ConstraintLayout>
