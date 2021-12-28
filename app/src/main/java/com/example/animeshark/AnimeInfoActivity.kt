@@ -105,7 +105,7 @@ class AnimeInfoActivity : AppCompatActivity() {
                 val linkList = mutableListOf<String>()
                 for (link in links) {
                     val url = link.attr("href")
-                    if ("https://gogo-cdn.com" in url) {
+                    if ("cdn" in url) {
                         Log.i("MY_DEBUG", link.text())
                         Log.i("MY_DEBUG", url)
                         linkList.add(url)
@@ -123,24 +123,7 @@ class AnimeInfoActivity : AppCompatActivity() {
     }
 
     fun downloadGogoCDN(url: String, episodeString: String = "episodeString") {
-        Log.i("MY_DEBUG", url)
-
-//        val stringRequest = StringRequest( Request.Method.GET, url,
-//            { response ->
-//                Log.i("MY_DEBUG", response.toString())
-//            },
-//            { error ->
-//                Log.i("MY_DEBUG", "Response is: $error")
-//            })
-//        val requestQueue = Volley.newRequestQueue(this, object : HurlStack() {
-//            @Throws(IOException::class)
-//            override fun createConnection(url: URL?): HttpURLConnection {
-//                val connection: HttpURLConnection = super.createConnection(url)
-//                connection.instanceFollowRedirects = false
-//                return connection
-//            }
-//        })
-//        requestQueue.add(stringRequest)
+        Log.i("MY_DEBUG_HERE", url)
 
         val uri = Uri.parse(url)
         Environment
@@ -150,11 +133,11 @@ class AnimeInfoActivity : AppCompatActivity() {
         val request = DownloadManager.Request(uri)
             .addRequestHeader("Referer", "https://gogoplay1.com/")
             .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
-            .setTitle(episodeString)
-            .setDescription(animeName)
+            .setTitle("$animeName - $episodeString")
+            .setDescription("Animeshark")
             .setDestinationInExternalPublicDir(
                 Environment.DIRECTORY_DOWNLOADS,
-                "$animeName/$episodeString.mp4"
+                "$animeName/$episodeString - $animeName.mp4"
             )
         mgr.enqueue(request)
     }
